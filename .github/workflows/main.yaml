@@ -22,10 +22,11 @@ jobs:
           sudo apt install -y nodejs
           npm install
           npm install -g @sandworm/audit
-          ls -l sandworm/ 
       
       - name: Run Sandworm Scanner (Markdown format)
-        run: sandworm audit
+        run: |
+          sandworm audit
+          ls -l sandworm/ 
         continue-on-error: true
         
       - name: Upload results
