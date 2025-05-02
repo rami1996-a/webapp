@@ -1,29 +1,29 @@
-name: Django Security Scan
+name: webapp Security Scan
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  osv-scanner:
+  Sandworm:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.22'
           
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y npm
+          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+          | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] \
+          https://deb.nodesource.com/node_20.x nodistro main" \
+          | tee /etc/apt/sources.list.d/nodesource.list
+          apt update
+          apt install -y nodejs
           npm install
-          go install github.com/google/osv-scanner/cmd/osv-scanner@v1
-          
-      - name: Run OSV Scanner (Markdown format)
-        run: osv-scanner --format markdown . > osv-report.md
+          npm install -g @sandworm/audit    
+      
+      - name: Run Sandworm Scanner (Markdown format)
+        run: sandworm audit
         continue-on-error: true
         
       - name: Upload results
@@ -31,6 +31,6 @@ jobs:
         with:
           name: security-reports
           path:
-            osv-report.md
+            Sandworm/myapp@*-report.json
         if: always()
 
