@@ -5,35 +5,22 @@ on:
     branches: [ main ]
 
 jobs:
-  Sandworm:
+  njsscan:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-          
-      - name: Install dependencies
+      - name: install and run njsscan
         run: |
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
-          | gpg --dearmor | sudo tee /etc/apt/keyrings/nodesource.gpg > /dev/null
-          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] \
-          https://deb.nodesource.com/node_20.x nodistro main" \
-          | sudo tee /etc/apt/sources.list.d/nodesource.list > /dev/null
-          sudo apt update
-          sudo apt install -y nodejs
-          npm install
-          npm install -g @sandworm/audit
-      
-      - name: Run Sandworm Scanner (Markdown format)
-        run: |
-          sandworm audit
-          ls -l sandworm/ 
+            pip3 install --upgrade urllib3 chardet requests
+            pip3 install njsscan libsast
+            njsscan --json -o njsscan.json .
         continue-on-error: true
         
       - name: Upload results
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-reports
+      - uses: actions/upload-artifact@v4
+        with: 
+          name: security-report
           path:
-            sandworm/owasp-nodejs-goat@1.3.0-report.json
+            njsscan.json
         if: always()
 
