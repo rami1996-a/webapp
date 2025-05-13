@@ -9,18 +9,17 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: install and run njsscan
-      - run: |
-            pip3 install --upgrade urllib3 chardet requests
-            pip3 install njsscan libsast
-            njsscan --json -o njsscan.json .
+
+      - name: Install and run njsscan
+        run: |
+          pip3 install --upgrade urllib3 chardet requests
+          pip3 install njsscan libsast
+          njsscan --json -o njsscan.json .
         continue-on-error: true
-        
+
       - name: Upload results
-      - uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with: 
           name: security-report
-          path:
-            njsscan.json
+          path: njsscan.json
         if: always()
-
